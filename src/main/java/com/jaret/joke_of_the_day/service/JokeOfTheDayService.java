@@ -5,6 +5,7 @@ import com.jaret.joke_of_the_day.entity.JokeOfTheDayEntity;
 import com.jaret.joke_of_the_day.exception.InvalidJokeException;
 import com.jaret.joke_of_the_day.exception.JokeNotFoundException;
 import com.jaret.joke_of_the_day.repository.JokeOfTheDayRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -15,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
+@Slf4j
 public class JokeOfTheDayService implements JokeOfTheDaySourceInterface {
 
     private static final String NULL_DATE_MSG = "Date field cannot be null";
@@ -31,7 +33,7 @@ public class JokeOfTheDayService implements JokeOfTheDaySourceInterface {
 
     public JokeOfTheDay getJokeOfTheDayById(Long id) {
         JokeOfTheDayEntity jokeOfTheDayEntity = jokeOfTheDayRepository.findById(id).orElseThrow(() ->
-                new JokeNotFoundException(String.format("Joke with id %s was not found", id)));
+                new JokeNotFoundException(String.format("Joke not found for id %s", id)));
         JokeOfTheDay newJokeOfTheDay = new JokeOfTheDay();
         modelMapper.map(jokeOfTheDayEntity, newJokeOfTheDay);
         return newJokeOfTheDay;
@@ -47,6 +49,7 @@ public class JokeOfTheDayService implements JokeOfTheDaySourceInterface {
             modelMapper.map(jokeOfTheDayEntity, joke);
             return joke;
         }).orElseGet(() -> {
+            log.info("Joke of the day is missing");
             JokeOfTheDay joke = new JokeOfTheDay();
             modelMapper.map(getMissingJoke(), joke);
             return joke;
@@ -109,7 +112,7 @@ public class JokeOfTheDayService implements JokeOfTheDaySourceInterface {
      */
     public void deleteJokeOfTheDay(Long id) {
         if(!jokeOfTheDayRepository.existsById(id)) {
-            throw new JokeNotFoundException(String.format("Joke with id %s was not found", id));
+            throw new JokeNotFoundException(String.format("Joke not found for id %s", id));
         }
         jokeOfTheDayRepository.deleteById(id);
     }
@@ -148,7 +151,7 @@ public class JokeOfTheDayService implements JokeOfTheDaySourceInterface {
      */
     public void validateJokeOfTheDay(JokeOfTheDay jokeOfTheDay) {
         List<String> errors = new ArrayList<>();
-        if(jokeOfTheDay.getJoke() == null) {
+        if(jokeOfTheDay.getJoke() == null || jokeOfTheDay.getJoke().trim().isEmpty()) {
             errors.add(NULL_JOKE_MSG);
         }
         if(jokeOfTheDay.getDate() == null) {

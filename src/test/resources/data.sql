@@ -1,0 +1,1 @@
+delete from joke_of_the_day;
