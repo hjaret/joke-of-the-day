@@ -5,7 +5,7 @@ A RESTful service to CRUD on a Joke of the Day. The service runs an embedded H2 
 
 ## Installation
 ### Clone project
-`git clone`
+`git clone https://github.com/hjaret/joke-of-the-day.git`
 
 ### Run Docker Compose
 `docker compose up -d`
