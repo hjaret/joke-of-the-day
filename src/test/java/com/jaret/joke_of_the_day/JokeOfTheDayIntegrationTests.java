@@ -23,6 +23,7 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.web.context.WebApplicationContext;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.containsString;
@@ -54,6 +55,8 @@ class JokeOfTheDayIntegrationTests {
 	JokeOfTheDayEntity entity;
 
 	private static ObjectMapper mapper;
+
+	private final DateTimeFormatter sdf = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
 	@BeforeAll
 	static void beforeAll() {
@@ -88,7 +91,8 @@ class JokeOfTheDayIntegrationTests {
 
 	@Test
 	void getShouldReturnJokeForDateFromService() throws Exception {
-		this.mockMvc.perform(get("/jotd?date=2024-08-15"))
+		String dt = sdf.format(LocalDate.now());
+		this.mockMvc.perform(get("/jotd?date=" + dt))
 				.andDo(print()).andExpect(status().isOk()).andExpect(content().string(containsString("Funny joke")));
 	}
 
